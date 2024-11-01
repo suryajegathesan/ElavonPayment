@@ -95,6 +95,7 @@
 
          await ZOHO.CREATOR.API.getRecordById(config).then(function (response) {
             console.log(response.data);
+            console.log("Response of Customer");
             var get_data = response.data;
             curr = get_data.Currency;
             console.log(curr);
