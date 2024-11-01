@@ -1,0 +1,7 @@
+{
+  "service": "CREATOR",
+  "cspDomains": {
+    "connect-src": ["https://pruzet.com", "https://api.demo.convergepay.com"]
+  },
+  "config": []
+}

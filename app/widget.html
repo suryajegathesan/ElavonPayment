@@ -1,0 +1,440 @@
+<html>
+
+<head>
+  <meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+  <title>Checkout.js Credit Card Demo</title>
+  <script src="https://api.demo.convergepay.com/hosted-payments/Checkout.js"></script>
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+  <script src="https://js.zohostatic.com/creator/widgets/version/1.0/widgetsdk-min.js"></script>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+  <!-- <link rel="stylesheet" type="text/css" href="payment.css"> -->
+  <script>
+    ifesle();
+    async function ifesle() {
+     await ZOHO.CREATOR.init()
+        .then(async function () {
+          var queryParams = ZOHO.CREATOR.UTIL.getQueryParams();
+          creator_sale_id = queryParams.rec_id;
+          config = {
+            appName: "lcb",
+            reportName: "Sales_Order_for_Elavon",
+            id: creator_sale_id
+          }
+
+          //get specific record API
+          await ZOHO.CREATOR.API.getRecordById(config).then(function (response) {
+          //callback block
+          res1 = response.data;
+          console.log(res1);
+          });
+        });
+        if(res1.Payment_Status == "Awaiting Payment"){
+        console.log("efgh");
+      showOrderDetails();
+      creator_data();
+    
+  }
+  else if(res1.Payment_Status == "Unpaid"){
+    console.log("jwdbdf");
+    document.getElementById('Session').style.display = 'flex';
+    document.getElementById('order_details').style.display = 'none';
+    document.getElementById('payment_details').style.display = 'none';
+      document.getElementById('token').style.display = 'none';
+      document.getElementById('success').style.display = 'none';
+      document.getElementById('failure').style.display = 'none';
+
+  }
+      }
+   
+    
+    var res;
+    var customer;
+    let sales_no ;
+    var name;
+    var currency;
+    var amount;
+    let customer_ID;
+    var curr;
+    var creator_sale_id;
+    async function creator_data() {
+     await ZOHO.CREATOR.init()
+        .then(async function () {
+          var queryParams = ZOHO.CREATOR.UTIL.getQueryParams();
+          creator_sale_id = queryParams.rec_id;
+          config = {
+            appName: "lcb",
+            reportName: "Sales_Order_for_Elavon",
+            id: creator_sale_id
+          }
+
+          //get specific record API
+          await ZOHO.CREATOR.API.getRecordById(config).then(function (response) {
+          //callback block
+          console.log("Fetch response");
+          
+          console.log(response);
+          
+          res = response.data;
+          console.log(res);
+          customer = res.Customer_Name;
+          console.log(res);
+          sales_no = res.Sales_Order_Number;
+          console.log(sales_no);
+          name = customer.display_value;
+          customer_ID = customer.ID;
+        });
+      console.log(sales_no);
+
+          console.log(name);
+          var config = {
+            appName: "lcb",
+            reportName: "All_Customers",
+            id: customer_ID
+          }
+
+         await ZOHO.CREATOR.API.getRecordById(config).then(function (response) {
+            console.log(response.data);
+            var get_data = response.data;
+            curr = get_data.Currency;
+            console.log(curr);
+            var curr_type = curr.display_value;
+            document.getElementById("sale_no").innerText = sales_no;
+            document.getElementById("name").innerText = name;
+            document.getElementById("amount").innerText = res.Grand_Total;
+            document.getElementById("currency").innerText = curr_type;
+            document.getElementById("amount1").innerText = res.Grand_Total;
+            document.getElementById("currency1").innerText = curr_type;
+          });
+        });
+
+    }      
+
+    
+    function showOrderDetails() {
+      // Hide the payment details section
+      document.getElementById('payment_details').style.display = 'none';
+      document.getElementById('success').style.display = 'none';
+      document.getElementById('failure').style.display = 'none';
+      document.getElementById('Session').style.display = 'none';
+    }
+
+    function showPaymentDetails() {
+      // Hide the order details section
+      document.getElementById('order_details').style.display = 'none';
+      // creator_data();
+      // Show the payment details section
+      document.getElementById('payment_details').style.display = 'flex';
+      document.getElementById('token').style.display = 'none';
+      document.getElementById('success').style.display = 'none';
+      document.getElementById('failure').style.display = 'none';
+      document.getElementById('Session').style.display = 'none';
+    }
+
+    // Call showOrderDetails() on page load
+   
+
+    var get_token;
+    function initiateCheckoutJS() {
+      var ssl_data = {
+        ssl_transaction_type: "ccsale",
+        ssl_get_token: "Y",
+        ssl_add_token: "Y",
+        // ssl_amount:16.34
+        ssl_amount: res.Grand_Total
+      };
+
+      var form = new FormData();
+      form.append("environment", "Demo");
+      form.append("ssl_data", JSON.stringify(ssl_data));
+
+      var settings = {
+        url: "https://pruzet.com/elavon/Elavon_Session_Token.php",
+        method: "POST",
+        timeout: 0,
+        processData: false,
+        mimeType: "multipart/form-data",
+        contentType: false,
+        data: form,
+        "Access-Control-Allow-Origin": "*",
+      };
+
+      $.ajax(settings).done(function (response) {
+        token = response;
+        document.getElementById("token").value = response;
+      });
+
+
+      return false;
+    }
+
+    function pay() {
+      var token = document.getElementById("token").value;
+      var card = document.getElementById("card").value;
+      var exp = document.getElementById("exp").value;
+      var cvv = document.getElementById("cvv").value;
+      var gettoken = "y";
+      var addtoken = "y";
+      var invoice = document.getElementById("sale_no").value;
+      var firstname = document.getElementById("name").value;
+      var paymentData = {
+          ssl_txn_auth_token: token,
+          ssl_card_number: card,
+          ssl_exp_date: exp,
+          ssl_get_token: gettoken,
+          ssl_add_token: addtoken,
+          ssl_invoice_number: invoice,
+          ssl_first_name: firstname,
+          ssl_cvv2cvc2: cvv,
+      };
+      var callback = {
+        onError: function (error) {
+          showResult("error", error);
+        },
+        onDeclined: function (response) {
+          document.getElementById("txn_response").innerHTML =  "Your payment failed due to an "+response["ssl_result_message"] +" error.";
+          showResult("declined", JSON.stringify(response));
+        },
+        onApproval: function (response) {
+          console.log("Approval Code=" + response["ssl_approval_code"]);
+          showResult("approval", JSON.stringify(response));
+        },
+      };
+      ConvergeEmbeddedPayment.pay(paymentData, callback);
+      return false;
+    }
+
+    function showResult(status, msg) {
+      if(status == "declined")
+      {
+        document.getElementById('payment_details').style.display = 'none';
+        document.getElementById('failure').style.display = 'flex';
+        ZOHO.CREATOR.init()
+            .then(function() {
+              //Code goes here
+              var queryParams = ZOHO.CREATOR.UTIL.getQueryParams();
+          creator_sale_id = queryParams.rec_id;
+              formData = {
+                "data" : {
+              "Sales_Order" : creator_sale_id,
+              "Access_Token" : token,
+              "Payment_Response": msg,
+              "Payment_Status": status
+               }
+              }
+              config = {
+            appName : "lcb",
+            formName : "Elavon_Log",
+            data : formData
+    }
+    //add record API
+    ZOHO.CREATOR.API.addRecord(config).then(function(response){
+        //callback block
+        console.log(response.data);
+    });
+            });
+      }
+      else if(status == "approval")
+      {
+        document.getElementById('payment_details').style.display = 'none';
+        document.getElementById('success').style.display = 'flex';
+        ZOHO.CREATOR.init()
+            .then(function() {
+              //Code goes here
+              var queryParams = ZOHO.CREATOR.UTIL.getQueryParams();
+          creator_sale_id = queryParams.rec_id;
+              formData = {
+                "data" : {
+              "Sales_Order" : creator_sale_id,
+              "Access_Token" : token,
+              "Payment_Response": msg,
+              "Payment_Status": status
+               }
+              }
+              config = {
+            appName : "lcb",
+            formName : "Elavon_Log",
+            data : formData
+    }
+    //add record API
+    ZOHO.CREATOR.API.addRecord(config).then(function(response){
+        //callback block
+        console.log(response.data);
+    });
+            });
+      }
+      document.getElementById("txn_status").innerHTML =
+        "<b>" + status + "</b>";
+
+        
+      
+    }
+
+
+    function reload(){
+      ZOHO.CREATOR.init()
+            .then(function() {
+              //Code goes here
+              var queryParams = ZOHO.CREATOR.UTIL.getQueryParams();
+          var get_sales_id = queryParams.rec_id;
+        window.open("https://creatorapp.zoho.com/lsbltd/lcb/#Page:Payment_Page?rec_id="+get_sales_id); // Opens in a new tab
+            });
+    }
+    
+
+
+  </script>
+  <style>
+    .checkout-btn {
+      width: 100%;
+      padding: 0.7rem 1.5rem;
+      background: #607e99;
+      color: white;
+      border: none;
+      cursor: pointer;
+      transition: background-color 0.3s ease, transform 0.3s ease;
+    }
+
+    .checkout-btn:hover {
+      color: #1e2e3f;
+      transform: scale(1.05);
+    }
+
+    .checkout-btn:active {
+      transform: scale(1);
+    }
+
+    form input[type="text"] {
+      width: 100%;
+      padding: 0.5rem 0.7rem;
+      margin: 0.5rem 0;
+      outline: none;
+    }
+
+    #zip {
+      display: flex;
+      padding: 0.5rem 0.7rem;
+    }
+  </style>
+</head>
+
+<body>
+  <div id="order_details" style="width: 100%; display: flex; flex-direction: column; align-items: center;">
+    <h2 style="padding: 20px;">Payment Page</h2>
+    <div class="container1"
+      style="border: 1px solid #dddddd; width: 50%; background-color: #607e99; margin: 0 auto; text-align: left;">
+      <h3 style="padding-left: 30px;">Order Details</h3>
+    </div>
+    <div class="container2" style="border: 1px solid #dddddd; width: 50%; margin: 0 auto; text-align: left;">
+      <div
+        style="line-height: 1.5rem; padding-left: 50px; padding-top: 25px; padding-bottom: 25px;display: inline-block;">
+        <p style="font-weight: bold;">Sales Order No </p>
+        <p style="font-weight: bold;"> Name </p>
+        <p style="font-weight: bold;">Currency Type</p>
+        <p style="font-weight: bold;"> Transaction Amount </p>
+      </div>
+      <div
+        style="line-height: 1.5rem; text-align: right; float:right; padding-right: 10%; padding-top: 25px; padding-bottom: 25px;display: inline-block;">
+        <p id="sale_no"></p>
+        <p id="name"> </p>
+        <p id="currency"></p>
+        <p id="amount"></p>
+      </div>
+    </div>
+    <div style="margin-top: 70px;">
+      <input type="submit" value="Proceed to Payment" onclick="return initiateCheckoutJS(),showPaymentDetails();"
+        class="checkout-btn">
+    </div>
+  </div>
+
+
+
+
+  <div id="payment_details"
+  style="width: 100%; display: flex; flex-direction: column; align-items: center;padding-top: 5%;">
+    <h2 style="padding: 10px;">Payment Page</h2>
+    <div class="container1"
+      style="border: 1px solid #dddddd; width: 50%; background-color: #607e99; margin: 0 auto; text-align: left;">
+      <h3 style="padding-left: 20px;">Order Details</h3>
+    </div>
+    <div class="container2" style="border: 1px solid #dddddd; width: 50%; margin: 0 auto; text-align: left;">
+      <div
+        style="line-height: 1.5rem; padding-left: 50px; padding-top: 25px; padding-bottom: 25px;display: inline-block;">
+        <p style="font-weight: bold;"> Currency Type </p>
+        <p style="font-weight: bold;"> Transaction Amount </p>
+      </div>
+      <div
+        style="line-height: 1.5rem; text-align: right; float:right; padding-right: 10%; padding-top: 25px; padding-bottom: 25px;display: inline-block;">
+        <p id="currency1"></p>
+        <p id="amount1"></p>
+      </div>
+    </div>
+    <div style="padding-top: 50px;"></div>
+    <div class="container1"
+      style="border: 1px solid #dddddd; width: 50%; background-color: #607e99; margin: 0 auto; text-align: left;">
+      <h3 style="padding-left: 20px;">Payment Details</h3>
+    </div>
+    <div class="container2" style="border: 1px solid #dddddd; width: 50%; margin: 0 auto; text-align: left;">
+      <div
+        style="line-height: 1.5rem; padding-left: 25px; padding-top: 25px; padding-bottom: 25px;display: inline-block;">
+        <form>
+          <h3>Card number</h3>
+          <input id="card" type="text" name="card" value="4124939999999990">
+          <input id="token" type="text" name="token"  >
+          <div id="zip">
+            <label>
+            <h3>Expiry Date</h3>
+              <input id="exp" type="text" name="exp" value="1230">
+            </label>
+            <label style="margin-left: 10px;">
+             <h3>CVV2</h3>
+              <input id="cvv" type="text" name="cvv" value="123">
+            </label>
+          </div>
+        </form>
+      </div>
+    </div>
+    <div style="margin-top: 70px;">
+      <input type="submit" value="Process Payment" onclick="return pay()" class="checkout-btn">
+    </div>
+  </div>
+
+
+    <div id="success" style="width: 100%; display: flex; flex-direction: column; align-items: center;padding-top: 5%;text-align: center;">
+      <div class="box">
+        <i class="fa fa-check-circle" style="font-size:100px;color:green"></i>
+        <br>
+        <h2 style="text-align: center;">Payment Done</h2>
+        <p style="text-align: center;">Thank you for completing your secure online payment.</p><p style="text-align: center;">Have a great day!</p>
+      </div>
+    </div>
+
+    <div id="failure" style="width: 100%; display: flex; flex-direction: column; align-items: center;padding-top: 5%;text-align: center;">
+      <div class="box">
+        <i class="fa fa-exclamation-circle" style="font-size:100px;color:red"></i>
+        <br>
+        <h2 style="text-align: center;">Failed</h2>
+        <p style="text-align: center;" id="txn_response"></p>
+        <p style="padding-top: 50px;"><input type="submit" value="Try Again" class="checkout-btn" onclick="reload()" style="text-align: center;"></p>
+      </div>
+    </div>
+
+
+<div id="Session" style="width: 100%; display: flex; flex-direction: column; align-items: center;padding-top: 5%;text-align: center;">
+  <div class="container" style="width: 400px; height: 500px;border: 1px solid black; box-shadow:  5px 5px 5px 5px #888888;">
+    <div style="padding: 80px;">
+      <i class="fa fa-clock-o" style="font-size:120px;color:red"></i>
+  <p style="text-align: center;font-size:22px;">You Session has expired.</p>
+</div>
+</div>
+</div>
+<!-- <div id="get_status" style="flex-direction: column">
+  Transaction Status:<br>
+  <div id="txn_status"></div>
+  <br><br>
+  Transaction Response:<br>
+  <div id="txn_response"></div>
+</div> -->
+</body>
+
+</html>
