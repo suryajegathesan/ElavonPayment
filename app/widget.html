@@ -36,7 +36,7 @@
     
   }
   else if(res1.Payment_Status == "Unpaid"){
-    console.log("Unpaid Log");
+    console.log("jwdbdf");
     document.getElementById('Session').style.display = 'flex';
     document.getElementById('order_details').style.display = 'none';
     document.getElementById('payment_details').style.display = 'none';
@@ -57,6 +57,12 @@
     let customer_ID;
     var curr;
     var creator_sale_id;
+    var add_l1;
+    var add_l2;
+    var city;
+    var state_province;
+    var postal_code;
+    var country;
     async function creator_data() {
      await ZOHO.CREATOR.init()
         .then(async function () {
@@ -95,7 +101,12 @@
 
          await ZOHO.CREATOR.API.getRecordById(config).then(function (response) {
             console.log(response.data);
-            console.log("Response of Customer");
+            var add_l1 = response.data.Billing_Address.address_line_1;
+            var add_l2 = response.data.Billing_Address.address_line_2;
+            var city = response.data.Billing_Address.district_city;
+            var postal_code = response.data.Billing_Address.postal_code;
+            var country = response.data.Billing_Address.country;
+            var state_province = response.data.Billing_Address.state_province;
             var get_data = response.data;
             curr = get_data.Currency;
             console.log(curr);
@@ -106,6 +117,13 @@
             document.getElementById("currency").innerText = curr_type;
             document.getElementById("amount1").innerText = res.Grand_Total;
             document.getElementById("currency1").innerText = curr_type;
+            document.getElementById("add1").value = add_l1;
+            document.getElementById("add2").value = add_l2;
+            document.getElementById("city").value = city;
+            document.getElementById("post_code").value = postal_code;
+            document.getElementById("country").value = country;
+            document.getElementById("state").value = state_province;
+            document.getElementById("company").innerText = response.data.Company_Name;
           });
         });
 
@@ -178,6 +196,7 @@
       var addtoken = "y";
       var invoice = document.getElementById("sale_no").value;
       var firstname = document.getElementById("name").value;
+      var comp = document.getElementById("company").value;
       var paymentData = {
           ssl_txn_auth_token: token,
           ssl_card_number: card,
@@ -187,6 +206,7 @@
           ssl_invoice_number: invoice,
           ssl_first_name: firstname,
           ssl_cvv2cvc2: cvv,
+          
       };
       var callback = {
         onError: function (error) {
@@ -201,6 +221,7 @@
           showResult("approval", JSON.stringify(response));
         },
       };
+      console.log(paymentData);
       ConvergeEmbeddedPayment.pay(paymentData, callback);
       return false;
     }
@@ -352,49 +373,65 @@
 
 
   <div id="payment_details"
-  style="width: 100%; display: flex; flex-direction: column; align-items: center;padding-top: 5%;">
+  style="width: 100%; display: flex; flex-direction: column; align-items: center;padding-top: 2%;">
     <h2 style="padding: 10px;">Payment Page</h2>
-    <div class="container1"
-      style="border: 1px solid #dddddd; width: 50%; background-color: #607e99; margin: 0 auto; text-align: left;">
-      <h3 style="padding-left: 20px;">Order Details</h3>
-    </div>
-    <div class="container2" style="border: 1px solid #dddddd; width: 50%; margin: 0 auto; text-align: left;">
-      <div
-        style="line-height: 1.5rem; padding-left: 50px; padding-top: 25px; padding-bottom: 25px;display: inline-block;">
-        <p style="font-weight: bold;"> Currency Type </p>
-        <p style="font-weight: bold;"> Transaction Amount </p>
-      </div>
-      <div
-        style="line-height: 1.5rem; text-align: right; float:right; padding-right: 10%; padding-top: 25px; padding-bottom: 25px;display: inline-block;">
-        <p id="currency1"></p>
-        <p id="amount1"></p>
-      </div>
-    </div>
-    <div style="padding-top: 50px;"></div>
-    <div class="container1"
-      style="border: 1px solid #dddddd; width: 50%; background-color: #607e99; margin: 0 auto; text-align: left;">
-      <h3 style="padding-left: 20px;">Payment Details</h3>
-    </div>
-    <div class="container2" style="border: 1px solid #dddddd; width: 50%; margin: 0 auto; text-align: left;">
-      <div
-        style="line-height: 1.5rem; padding-left: 25px; padding-top: 25px; padding-bottom: 25px;display: inline-block;">
-        <form>
-          <h3>Card number</h3>
-          <input id="card" type="text" name="card" value="4124939999999990">
-          <input id="token" type="text" name="token"  >
-          <div id="zip">
-            <label>
-            <h3>Expiry Date</h3>
-              <input id="exp" type="text" name="exp" value="1230">
-            </label>
-            <label style="margin-left: 10px;">
-             <h3>CVV2</h3>
-              <input id="cvv" type="text" name="cvv" value="123">
-            </label>
+    <div style="display: flex; gap: 150px;">
+      <!-- Left Column: Order Details and Payment Details -->
+      <div style="display: flex; flex-direction: column; gap: 20px; width: 300px;">
+          <!-- Order Details Section -->
+          <div style="border-radius: 5px;width:400px">
+              <h3 style="font-size: 1.2em; background-color:#5f7d95;padding: 15px;margin: 0;">Order Details</h3>
+              <div style="background-color: white; padding: 10px;border:1px solid #dddddd">
+                  <p style="font-weight: bold; margin-bottom: 8px;">Currency Type <span style="float: right;font-weight: normal;" id="currency1"></span> </p>
+                  <p style="font-weight: bold;">Transaction Amount <span style="float: right;font-weight: normal;" id="amount1"></span> </p>
+              </div>
           </div>
-        </form>
+
+          <!-- Payment Details Section -->
+          <div style="border-radius: 5px;width:400px">
+              <h3 style="font-size: 1.2em; background-color:#5f7d95;padding: 15px;margin: 0; ">Payment Details</h3>
+              <div style="background-color: white; padding: 15px;border:1px solid #dddddd">
+                  <p style="font-weight: bold; margin-bottom: 8px;">Card number</p>
+                  <input id="card" type="text" name="card" value="4124939999999990" style="width: 100%; padding: 8px; margin-bottom: 10px; box-sizing: border-box; border: 1px solid #ccc; border-radius: 4px;">
+                  <input id="token" type="text" name="token" style="width: 100%; padding: 8px; margin-bottom: 10px; box-sizing: border-box; border: 1px solid #ccc; border-radius: 4px;">
+                  <div style="display: flex; gap: 10px;">
+                      <div style="flex: 1;">
+                          <p style="font-weight: bold; margin-bottom: 5px;">Expiry Date</p>
+                          <input id="exp" type="text" name="exp" placeholder="1230" style="width: 100%; padding: 8px; box-sizing: border-box; border: 1px solid #ccc; border-radius: 4px;">
+                      </div>
+                      <div style="flex: 1;">
+                          <p style="font-weight: bold; margin-bottom: 5px;">CVV2</p>
+                          <input id="cvv" type="text" name="cvv" placeholder="123" style="width: 100%; padding: 8px; box-sizing: border-box; border: 1px solid #ccc; border-radius: 4px;">
+                      </div>
+                  </div>
+              </div>
+          </div>
+      </div>
+       <!-- Billing Section -->
+       <div style="border-radius: 5px; width: 400px;">
+        <h3 style="font-size: 1.2em; background-color:#5f7d95;padding: 15px;margin: 0;">Billing Address</h3>
+        <div style="background-color: white; padding: 15px;border:1px solid #dddddd">
+          <div style="background-color: white;">
+            <p style="font-weight: bold; margin-bottom: 15px;margin-left: 5px;">Company <span style="float: right;font-weight: normal;" id="company"></span> </p>
+          </div>
+          <div style="display: flex; flex-direction: column; margin-bottom: 10px;">
+              <input type="text" id="add1" placeholder="Address1" style="width: 100%; padding: 8px; margin-bottom: 5px; box-sizing: border-box; border: 1px solid #ccc; border-radius: 4px;">
+          </div>
+          <div style="display: flex; flex-direction: column; margin-bottom: 10px;">
+              <input type="text" id="add2" placeholder="Address2" style="width: 100%; padding: 8px; margin-bottom: 5px; box-sizing: border-box; border-radius: 4px;">
+          </div>
+          <div style="display: flex; gap: 10px; margin-bottom: 10px;">
+              <input type="text" id="city" placeholder="City" style="width: calc(33.33% - 6px); padding: 8px; box-sizing: border-box; border: 1px solid #ccc; border-radius: 4px;">
+              <input type="text" id="state" placeholder="State/Province" style="width: calc(33.33% - 6px); padding: 8px; box-sizing: border-box; border: 1px solid #ccc; border-radius: 4px;">
+              <input type="text" id="post_code" placeholder="Postal Code" style="width: calc(33.33% - 6px); padding: 8px; box-sizing: border-box; border: 1px solid #ccc; border-radius: 4px;">
+          </div>
+          <div style="display: flex; gap: 10px; margin-bottom: 10px;">
+              <input type="text" id="country" placeholder="Country" style="width: 100%; padding: 8px; box-sizing: border-box; border: 1px solid #ccc; border-radius: 4px;">
+          </div>
+          
       </div>
     </div>
+  </div>
     <div style="margin-top: 70px;">
       <input type="submit" value="Process Payment" onclick="return pay()" class="checkout-btn">
     </div>
@@ -428,7 +465,7 @@
   <p style="text-align: center;font-size:22px;">You Session has expired.</p>
 </div>
 </div>
-</div>
+</div>	
 <!-- <div id="get_status" style="flex-direction: column">
   Transaction Status:<br>
   <div id="txn_status"></div>
