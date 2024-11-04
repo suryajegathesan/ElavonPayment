@@ -63,6 +63,7 @@
     var state_province;
     var postal_code;
     var country;
+    var company;
     async function creator_data() {
      await ZOHO.CREATOR.init()
         .then(async function () {
@@ -107,6 +108,7 @@
             var postal_code = response.data.Billing_Address.postal_code;
             var country = response.data.Billing_Address.country;
             var state_province = response.data.Billing_Address.state_province;
+            var company = response.data.Company_Name;
             var get_data = response.data;
             curr = get_data.Currency;
             console.log(curr);
@@ -205,8 +207,14 @@
           ssl_add_token: addtoken,
           ssl_invoice_number: invoice,
           ssl_first_name: firstname,
+          ssl_last_name: firstname,
+          ssl_company : document.getElementById("company").innerText,
           ssl_cvv2cvc2: cvv,
-          
+          ssl_avs_address: document.getElementById("add1").value,
+          ssl_address2: document.getElementById("add2").value,
+          ssl_city:  document.getElementById("city").value,
+          ssl_state: document.getElementById("state").value,
+          ssl_avs_zip: document.getElementById("post_code").value,
       };
       var callback = {
         onError: function (error) {
@@ -397,11 +405,11 @@
                   <div style="display: flex; gap: 10px;">
                       <div style="flex: 1;">
                           <p style="font-weight: bold; margin-bottom: 5px;">Expiry Date</p>
-                          <input id="exp" type="text" name="exp" placeholder="1230" style="width: 100%; padding: 8px; box-sizing: border-box; border: 1px solid #ccc; border-radius: 4px;">
+                          <input id="exp" type="text" name="exp" value="1230" style="width: 100%; padding: 8px; box-sizing: border-box; border: 1px solid #ccc; border-radius: 4px;">
                       </div>
                       <div style="flex: 1;">
                           <p style="font-weight: bold; margin-bottom: 5px;">CVV2</p>
-                          <input id="cvv" type="text" name="cvv" placeholder="123" style="width: 100%; padding: 8px; box-sizing: border-box; border: 1px solid #ccc; border-radius: 4px;">
+                          <input id="cvv" type="text" name="cvv" value="123" style="width: 100%; padding: 8px; box-sizing: border-box; border: 1px solid #ccc; border-radius: 4px;">
                       </div>
                   </div>
               </div>
