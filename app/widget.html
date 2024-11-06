@@ -168,7 +168,7 @@
       var form = new FormData();
       form.append("environment", "Demo");
       form.append("ssl_data", JSON.stringify(ssl_data));
-
+      console.log(document.getElementById("currency").innerText);
       var settings = {
         url: "https://pruzet.com/elavon/Elavon_Session_Token.php",
         method: "POST",
