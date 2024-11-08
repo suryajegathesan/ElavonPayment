@@ -64,6 +64,8 @@
     var postal_code;
     var country;
     var company;
+    var con_fname;
+    var con_lname;
     async function creator_data() {
      await ZOHO.CREATOR.init()
         .then(async function () {
@@ -111,6 +113,8 @@
             var company = response.data.Company_Name;
             var get_data = response.data;
             curr = get_data.Currency;
+            con_fname = response.data.Primary_Contact.first_name;
+            con_lname = response.data.Primary_Contact.last_name;
             console.log(curr);
             var curr_type = curr.display_value;
             document.getElementById("sale_no").innerText = sales_no;
@@ -202,9 +206,22 @@
       var cvv = document.getElementById("cvv").value;
       var gettoken = "y";
       var addtoken = "y";
-      var invoice = document.getElementById("sale_no").value;
+      console.log(document.getElementById("country").value);
+      var invoice = document.getElementById("sale_no").innerText;
       var firstname = document.getElementById("name").value;
       var comp = document.getElementById("company").value;
+      var con_code;
+      if( document.getElementById("country").value == "USA" )
+      {
+        con_code = "USA";
+      }
+      else if ( document.getElementById("country").value == "Canada" ){
+        con_code = "CAN";
+      }
+      else if( document.getElementById("country").value == "Canada" ){
+        con_code = "IND";
+      }
+      console.log(con_code);
       var paymentData = {
           ssl_txn_auth_token: token,
           ssl_card_number: card,
@@ -212,8 +229,8 @@
           ssl_get_token: gettoken,
           ssl_add_token: addtoken,
           ssl_invoice_number: invoice,
-          ssl_first_name: firstname,
-          ssl_last_name: firstname,
+          ssl_first_name: con_fname,
+          ssl_last_name: con_lname,
           ssl_company : document.getElementById("company").innerText,
           ssl_cvv2cvc2: cvv,
           ssl_avs_address: document.getElementById("add1").value,
@@ -221,6 +238,7 @@
           ssl_city:  document.getElementById("city").value,
           ssl_state: document.getElementById("state").value,
           ssl_avs_zip: document.getElementById("post_code").value,
+          ssl_country : con_code
       };
       var callback = {
         onError: function (error) {
