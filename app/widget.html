@@ -141,6 +141,7 @@
       document.getElementById('payment_details').style.display = 'none';
       document.getElementById('success').style.display = 'none';
       document.getElementById('failure').style.display = 'none';
+      document.getElementById('failure1').style.display = 'none';
       document.getElementById('Session').style.display = 'none';
     }
 
@@ -149,7 +150,12 @@
       document.getElementById('order_details').style.display = 'none';
       // creator_data();
       // Show the payment details section
-      document.getElementById('payment_details').style.display = 'flex';
+      if( document.getElementById("token").value != "" ){
+        document.getElementById('payment_details').style.display = 'flex';
+      }
+      else{
+        document.getElementById('failure1').style.display = 'flex';
+      }
       document.getElementById('token').style.display = 'none';
       document.getElementById('success').style.display = 'none';
       document.getElementById('failure').style.display = 'none';
@@ -161,6 +167,7 @@
 
     var get_token;
     function initiateCheckoutJS() {
+      document.getElementById("proceed_btn").disabled = true;
       var ssl_data = {
         ssl_transaction_type: "ccsale",
         ssl_get_token: "Y",
@@ -193,9 +200,8 @@
       $.ajax(settings).done(function (response) {
         token = response;
         document.getElementById("token").value = response;
+        showPaymentDetails();
       });
-
-
       return false;
     }
 
@@ -396,7 +402,7 @@
       </div>
     </div>
     <div style="margin-top: 70px;">
-      <input type="submit" value="Proceed to Payment" onclick="return initiateCheckoutJS(),showPaymentDetails();"
+      <input type="submit" id="proceed_btn" value="Proceed to Payment" onclick="return initiateCheckoutJS();"
         class="checkout-btn">
     </div>
   </div>
@@ -489,12 +495,22 @@
       </div>
     </div>
 
+    <div id="failure1" style="width: 100%; display: flex; flex-direction: column; align-items: center;padding-top: 5%;text-align: center;">
+      <div class="box">
+        <i class="fa fa-exclamation-circle" style="font-size:100px;color:red"></i>
+        <br>
+        <h2 style="text-align: center;">Error in payment process.Please contact admin</h2>
+        <p style="text-align: center;" id="txn_response"></p>
+        <p style="padding-top: 50px;"><input type="submit" value="Try Again" class="checkout-btn" onclick="reload()" style="text-align: center;"></p>
+      </div>
+    </div>
+
 
 <div id="Session" style="width: 100%; display: flex; flex-direction: column; align-items: center;padding-top: 5%;text-align: center;">
-  <div class="container" style="width: 400px; height: 500px;border: 1px solid black; box-shadow:  5px 5px 5px 5px #888888;">
-    <div style="padding: 80px;">
+  <div class="container" style="width: 400px; height: 250px;border: 1px solid black; box-shadow:  5px 5px 5px 5px #888888;">
+    <div style="padding: 15px;">
       <i class="fa fa-clock-o" style="font-size:120px;color:red"></i>
-  <p style="text-align: center;font-size:22px;">You Session has expired.</p>
+  <p style="text-align: center;font-size:22px;">Your session has expired because payment was not completed within 60 minutes.</p>
 </div>
 </div>
 </div>	
