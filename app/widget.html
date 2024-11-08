@@ -66,6 +66,8 @@
     var company;
     var con_fname;
     var con_lname;
+    var email;
+    var phone;
     async function creator_data() {
      await ZOHO.CREATOR.init()
         .then(async function () {
@@ -115,6 +117,8 @@
             curr = get_data.Currency;
             con_fname = response.data.Primary_Contact.first_name;
             con_lname = response.data.Primary_Contact.last_name;
+            email =  response.data.Email;
+            phone = response.data.Phone_Number;
             console.log(curr);
             var curr_type = curr.display_value;
             document.getElementById("sale_no").innerText = sales_no;
@@ -224,7 +228,7 @@
       else if ( document.getElementById("country").value == "Canada" ){
         con_code = "CAN";
       }
-      else if( document.getElementById("country").value == "Canada" ){
+      else if( document.getElementById("country").value == "India" ){
         con_code = "IND";
       }
       console.log(con_code);
@@ -244,7 +248,9 @@
           ssl_city:  document.getElementById("city").value,
           ssl_state: document.getElementById("state").value,
           ssl_avs_zip: document.getElementById("post_code").value,
-          ssl_country : con_code
+          ssl_country : con_code,
+          ssl_email : email,
+          ssl_phone : Number(phone)
       };
       var callback = {
         onError: function (error) {
