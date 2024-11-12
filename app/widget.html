@@ -26,17 +26,17 @@
           await ZOHO.CREATOR.API.getRecordById(config).then(function (response) {
           //callback block
           res1 = response.data;
-          console.log(res1);
+        //  console.log(res1);
           });
         });
         if(res1.Payment_Status == "Awaiting Payment"){
-        console.log("efgh");
+      //  console.log("efgh");
       showOrderDetails();
       creator_data();
     
   }
   else if(res1.Payment_Status == "Unpaid"){
-    console.log("jwdbdf");
+  //  console.log("jwdbdf");
     document.getElementById('Session').style.display = 'flex';
     document.getElementById('order_details').style.display = 'none';
     document.getElementById('payment_details').style.display = 'none';
@@ -82,22 +82,22 @@
           //get specific record API
           await ZOHO.CREATOR.API.getRecordById(config).then(function (response) {
           //callback block
-          console.log("Fetch response");
+        //  console.log("Fetch response");
           
-          console.log(response);
+        //  console.log(response);
           
           res = response.data;
-          console.log(res);
+        //  console.log(res);
           customer = res.Customer_Name;
-          console.log(res);
+        //  console.log(res);
           sales_no = res.Sales_Order_Number;
-          console.log(sales_no);
+        //  console.log(sales_no);
           name = customer.display_value;
           customer_ID = customer.ID;
         });
-      console.log(sales_no);
+    //  console.log(sales_no);
 
-          console.log(name);
+    //      console.log(name);
           var config = {
             appName: "lcb",
             reportName: "All_Customers",
@@ -105,7 +105,7 @@
           }
 
          await ZOHO.CREATOR.API.getRecordById(config).then(function (response) {
-            console.log(response.data);
+     //       console.log(response.data);
             var add_l1 = response.data.Billing_Address.address_line_1;
             var add_l2 = response.data.Billing_Address.address_line_2;
             var city = response.data.Billing_Address.district_city;
@@ -119,7 +119,7 @@
             con_lname = response.data.Primary_Contact.last_name;
             email =  response.data.Email;
             phone = response.data.Phone_Number;
-            console.log(curr);
+     //       console.log(curr);
             var curr_type = curr.display_value;
             document.getElementById("sale_no").innerText = sales_no;
             document.getElementById("name").innerText = name;
@@ -154,11 +154,12 @@
       document.getElementById('order_details').style.display = 'none';
       // creator_data();
       // Show the payment details section
-      if( document.getElementById("token").value != "" ){
+      if( !document.getElementById("token").value.includes("error") ){
         document.getElementById('payment_details').style.display = 'flex';
       }
       else{
         document.getElementById('failure1').style.display = 'flex';
+        document.getElementById("err_code").innerText = error_code;
       }
       document.getElementById('token').style.display = 'none';
       document.getElementById('success').style.display = 'none';
@@ -170,6 +171,7 @@
    
 
     var get_token;
+    var error_code;
     function initiateCheckoutJS() {
       document.getElementById("proceed_btn").disabled = true;
       var ssl_data = {
@@ -204,6 +206,14 @@
       $.ajax(settings).done(function (response) {
         token = response;
         document.getElementById("token").value = response;
+        try{
+          if( document.getElementById("token").value.includes("error") ){
+            error_code = document.getElementById("token").value.match(/\b\d{3}\b/)[0]
+          }
+        }
+        catch(e){
+
+        }
         showPaymentDetails();
       });
       return false;
@@ -216,7 +226,6 @@
       var cvv = document.getElementById("cvv").value;
       var gettoken = "y";
       var addtoken = "y";
-      console.log(document.getElementById("country").value);
       var invoice = document.getElementById("sale_no").innerText;
       var firstname = document.getElementById("name").value;
       var comp = document.getElementById("company").value;
@@ -231,7 +240,6 @@
       else if( document.getElementById("country").value == "India" ){
         con_code = "IND";
       }
-      console.log(con_code);
       var paymentData = {
           ssl_txn_auth_token: token,
           ssl_card_number: card,
@@ -261,11 +269,11 @@
           showResult("declined", JSON.stringify(response));
         },
         onApproval: function (response) {
-          console.log("Approval Code=" + response["ssl_approval_code"]);
+          //console.log("Approval Code=" + response["ssl_approval_code"]);
           showResult("approval", JSON.stringify(response));
         },
       };
-      console.log(paymentData);
+    //  console.log(paymentData);
       ConvergeEmbeddedPayment.pay(paymentData, callback);
       return false;
     }
@@ -296,7 +304,7 @@
     //add record API
     ZOHO.CREATOR.API.addRecord(config).then(function(response){
         //callback block
-        console.log(response.data);
+       // console.log(response.data);
     });
             });
       }
@@ -325,7 +333,7 @@
     //add record API
     ZOHO.CREATOR.API.addRecord(config).then(function(response){
         //callback block
-        console.log(response.data);
+       // console.log(response.data);
     });
             });
       }
@@ -505,7 +513,7 @@
       <div class="box">
         <i class="fa fa-exclamation-circle" style="font-size:100px;color:red"></i>
         <br>
-        <h2 style="text-align: center;">Error in payment process.Please contact admin</h2>
+        <h2 style="text-align: center;">Error in payment process.Please contact admin Error Code:<span id="err_code"></span></h2>
         <p style="text-align: center;" id="txn_response"></p>
         <p style="padding-top: 50px;"><input type="submit" value="Try Again" class="checkout-btn" onclick="reload()" style="text-align: center;"></p>
       </div>
